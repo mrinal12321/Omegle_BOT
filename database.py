@@ -1,12 +1,10 @@
 import aiosqlite
 from datetime import date, timedelta, datetime
 
-# Updated to use the Railway persistent volume path
-DB_NAME = "/data/test_bot.db"
+DB_NAME = "test_bot.db" # Update to "/data/test_bot.db" when deploying to Railway
 
 async def init_db():
     async with aiosqlite.connect(DB_NAME) as db:
-        # Added is_vip to the schema so make_user_vip doesn't throw an SQL error
         await db.execute('''CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
             matches_today INTEGER DEFAULT 0,
@@ -25,13 +23,13 @@ async def add_or_update_user(user_id: int):
         if row is None:
             await db.execute("INSERT INTO users (id, last_match_date) VALUES (?, ?)", (user_id, today))
         elif row[0] != today:
-            await db.execute("UPDATE users SET matches_today=0, last_match_date=? WHERE id=?", (today, user_id))
+            # The matches_today=0 reset has been removed so the count is permanent
+            await db.execute("UPDATE users SET last_match_date=? WHERE id=?", (today, user_id))
         
         await db.commit()
 
-async def can_user_match(user_id: int, free_limit: int = 3) -> bool:
+async def can_user_match(user_id: int, free_limit: int = 1) -> bool:
     async with aiosqlite.connect(DB_NAME) as db:
-        # Added is_vip to the fetch query
         cursor = await db.execute("SELECT premium_until, matches_today, is_vip FROM users WHERE id=?", (user_id,))
         row = await cursor.fetchone()
         
@@ -42,11 +40,9 @@ async def can_user_match(user_id: int, free_limit: int = 3) -> bool:
         matches_today = row[1]
         is_vip = row[2]
         
-        # If they are a VIP, instantly grant access
         if is_vip == 1:
             return True
             
-        # Check if they have an active premium date
         is_premium = False
         if premium_until:
             expiration_date = datetime.strptime(premium_until, "%Y-%m-%d").date()
@@ -79,7 +75,7 @@ async def add_premium_days(user_id: int, days: int):
 
         await db.execute("UPDATE users SET premium_until = ? WHERE id = ?", (str(new_expiration), user_id))
         await db.commit()
-
+        
 async def make_user_vip(user_id: int): #For admin use only
     """Admin function to grant lifetime access."""
     async with aiosqlite.connect(DB_NAME) as db:
