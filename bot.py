@@ -165,9 +165,9 @@ async def stop_chat(message: types.Message):
 @dp.message(F.text == "✯ Premium")
 async def show_subscription_plans(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✩ 1 Week - 119 Stars", callback_data="plan_7")],
-        [InlineKeyboardButton(text="✭ 1 Month - 299 Stars", callback_data="plan_30")],
-        [InlineKeyboardButton(text="✮ 3 Months - 499 Stars", callback_data="plan_90")]
+        [InlineKeyboardButton(text="✩ 1 Week - 100 Stars", callback_data="plan_7")],
+        [InlineKeyboardButton(text="✭ 1 Month - 250 Stars", callback_data="plan_30")],
+        [InlineKeyboardButton(text="✮ 3 Months - 500 Stars", callback_data="plan_90")]
     ])
     
     await message.answer("Choose a Premium plan to unlock unlimited matches:", reply_markup=keyboard)
@@ -177,13 +177,13 @@ async def send_plan_invoice(callback: types.CallbackQuery):
     plan_days = callback.data.split("_")[1] 
     
     if plan_days == "7":
-        price = 119
+        price = 100
         title = "1 Week Premium"
     elif plan_days == "30":
-        price = 299
+        price = 250
         title = "1 Month Premium"
     elif plan_days == "90":
-        price = 499
+        price = 500
         title = "3 Months Premium"
     
     payload = f"sub_{plan_days}" 
