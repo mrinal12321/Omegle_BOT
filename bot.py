@@ -26,7 +26,7 @@ async def start(message: types.Message):
     
     menu = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="⚡ Connect"), KeyboardButton(text="⏹️ Disconnect")],
+            [KeyboardButton(text="🔗 Connect"), KeyboardButton(text="⛓️‍💥 Disconnect")],
             [KeyboardButton(text="💎 Premium"), KeyboardButton(text="↩️ Delete")]
         ],
         resize_keyboard=True, 
@@ -162,12 +162,12 @@ async def stop_chat(message: types.Message):
 
 
 @dp.message(Command("subscribe"))
-@dp.message(F.text == "💎 Premium")
+@dp.message(F.text == "✯ Premium")
 async def show_subscription_plans(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="◔ 1 Week - 119 Stars", callback_data="plan_7")],
-        [InlineKeyboardButton(text="⏺ 1 Month - 299 Stars", callback_data="plan_30")],
-        [InlineKeyboardButton(text="⏺⏺⏺ 3 Months - 499 Stars", callback_data="plan_90")]
+        [InlineKeyboardButton(text="✩ 1 Week - 119 Stars", callback_data="plan_7")],
+        [InlineKeyboardButton(text="✭ 1 Month - 299 Stars", callback_data="plan_30")],
+        [InlineKeyboardButton(text="✮ 3 Months - 499 Stars", callback_data="plan_90")]
     ])
     
     await message.answer("Choose a Premium plan to unlock unlimited matches:", reply_markup=keyboard)
