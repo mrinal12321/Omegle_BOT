@@ -27,7 +27,7 @@ async def start(message: types.Message):
     menu = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="🔗 Connect"), KeyboardButton(text="⛓️‍💥 Disconnect")],
-            [KeyboardButton(text="💎 Premium"), KeyboardButton(text="↩️ Delete")]
+            [KeyboardButton(text="✯ Premium"), KeyboardButton(text="↩️ Delete")]
         ],
         resize_keyboard=True, 
         is_persistent=True    
@@ -282,7 +282,7 @@ async def relay_message(message: types.Message):
             
         message_map[user_id][message.message_id] = copied_msg.message_id
     else:
-        await message.answer("You are not currently in a chat. Use ⚡ Connect to find a partner.")
+        await message.answer("You are not currently in a chat. Use 🔗 Connect to find a partner.")
 
 async def main():
     await init_db()
