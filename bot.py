@@ -40,7 +40,7 @@ async def start(message: types.Message):
     )
 
 @dp.message(Command("match"))
-@dp.message(F.text == "⚡ Connect")
+@dp.message(F.text == "🔗 Connect")
 async def match_user(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     await add_or_update_user(user_id)
@@ -105,7 +105,7 @@ async def set_target_gender(callback: types.CallbackQuery, state: FSMContext):
 
     profile = {"gender": data["gender"], "age": data["age"], "pref_gender": target}
     
-    await callback.message.edit_text("✅ Searching for a match!...")
+    await callback.message.edit_text("🔎︎ Searching for a match!...\n Send text or messages.\n Type /stop to stop.")
     
     await run_matchmaker(callback.from_user.id, profile, callback.message)
 
@@ -132,17 +132,17 @@ async def run_matchmaker(user_id: int, profile: dict, context_msg: types.Message
 
         await bot.send_message(
             user_id,
-            f"⚡ Matched!\nSay hi!"
+            f"🔗 Matched!\nSay hi!\nType /stop to disconnect."
         )
         await bot.send_message(
             matched_partner_id,
-            f"⚡ Matched!\nSay hi!"
+            f"🔗 Matched!\nSay hi!\nType /stop to disconnect."
         )
     else:
         waitlist[user_id] = profile
 
 @dp.message(Command("stop"))
-@dp.message(F.text == "⏹️ Disconnect")
+@dp.message(F.text == "⛓️‍💥 Disconnect")
 async def stop_chat(message: types.Message):
     user_id = message.from_user.id
     
@@ -152,8 +152,8 @@ async def stop_chat(message: types.Message):
         message_map.pop(user_id, None)
         message_map.pop(partner_id, None)
         
-        await message.answer("You disconnected from the chat. Use ⚡ Connect to find a new partner.")
-        await bot.send_message(partner_id, "Your partner left the chat. Use ⚡ Connect to find a new one.")
+        await message.answer("You disconnected from the chat. Use 🔗 Connect to find a new partner.")
+        await bot.send_message(partner_id, "Your partner left the chat. Use 🔗 Connect to find a new one.")
     elif user_id in waitlist:
         del waitlist[user_id]  
         await message.answer("You left the waitlist.")
@@ -165,9 +165,9 @@ async def stop_chat(message: types.Message):
 @dp.message(F.text == "💎 Premium")
 async def show_subscription_plans(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🥉 1 Week - 119 Stars", callback_data="plan_7")],
-        [InlineKeyboardButton(text="🥈 1 Month - 299 Stars", callback_data="plan_30")],
-        [InlineKeyboardButton(text="🥇 3 Months - 499 Stars", callback_data="plan_90")]
+        [InlineKeyboardButton(text="◔ 1 Week - 119 Stars", callback_data="plan_7")],
+        [InlineKeyboardButton(text="⏺ 1 Month - 299 Stars", callback_data="plan_30")],
+        [InlineKeyboardButton(text="⏺⏺⏺ 3 Months - 499 Stars", callback_data="plan_90")]
     ])
     
     await message.answer("Choose a Premium plan to unlock unlimited matches:", reply_markup=keyboard)
