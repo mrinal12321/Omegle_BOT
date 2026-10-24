@@ -81,8 +81,8 @@ async def set_gender(callback: types.CallbackQuery, state: FSMContext):
 
 @dp.message(ProfileSetup.age, F.text)
 async def set_age(message: types.Message, state: FSMContext):
-    if not message.text.isdigit() or not (18 <= int(message.text) <= 99):
-        await message.answer("Please enter a valid age between 18 and 99.")
+    if not message.text.isdigit() or not (18 <= int(message.text) <= 9999):
+        await message.answer("Please enter a valid age(18+).")
         return
 
     await state.update_data(age=int(message.text))
@@ -156,9 +156,9 @@ async def stop_chat(message: types.Message):
         await bot.send_message(partner_id, "Your partner left the chat. Use 🔗 Connect or type /match to find a new one.")
     elif user_id in waitlist:
         del waitlist[user_id]  
-        await message.answer("You left the waitlist.")
+        await message.answer("You disconnected from the chat. Use 🔗 Connect or type /match to find a new partner.")
     else:
-        await message.answer("You aren't in a chat or on the waitlist right now.")
+        await message.answer("You disconnected from the chat or currently not in one. Use 🔗 Connect or type /match to find a new partner.")
 
 
 @dp.message(Command("subscribe"))
