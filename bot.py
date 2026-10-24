@@ -152,8 +152,8 @@ async def stop_chat(message: types.Message):
         message_map.pop(user_id, None)
         message_map.pop(partner_id, None)
         
-        await message.answer("You disconnected from the chat. Use 🔗 Connect to find a new partner.")
-        await bot.send_message(partner_id, "Your partner left the chat. Use 🔗 Connect to find a new one.")
+        await message.answer("You disconnected from the chat. Use 🔗 Connect or type /match to find a new partner.")
+        await bot.send_message(partner_id, "Your partner left the chat. Use 🔗 Connect or type /match to find a new one.")
     elif user_id in waitlist:
         del waitlist[user_id]  
         await message.answer("You left the waitlist.")
