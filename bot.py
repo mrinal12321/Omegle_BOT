@@ -107,22 +107,27 @@ async def set_target_gender(callback: types.CallbackQuery, state: FSMContext):
     
     await callback.message.edit_text("🔎︎ Searching for a match!...\n Send text or messages.\n Type /stop to stop.")
     
-    await run_matchmaker(callback.from_user.id, profile, callback.message)
+    await run_matchmaker(callback.from_user.id, profile)
 
-async def run_matchmaker(user_id: int, profile: dict, context_msg: types.Message):
+async def run_matchmaker(user_id: int, profile: dict, is_retry: bool = False):
     matched_partner_id = None
 
     for pid, p_pref in list(waitlist.items()):
+        # Prevent matching with themselves during a retry
+        if pid == user_id:
+            continue 
+            
         partner_accepts_user = (p_pref["pref_gender"] in ("ANY", profile["gender"]))
         user_accepts_partner = (profile["pref_gender"] in ("ANY", p_pref["gender"]))
 
         if partner_accepts_user and user_accepts_partner:
             matched_partner_id = pid
-            partner_profile = p_pref
             break
 
     if matched_partner_id:
-        del waitlist[matched_partner_id]
+        # Match found! Safely remove both users from the waitlist
+        waitlist.pop(user_id, None)
+        waitlist.pop(matched_partner_id, None)
 
         active_matches[user_id] = matched_partner_id
         active_matches[matched_partner_id] = user_id
@@ -130,16 +135,32 @@ async def run_matchmaker(user_id: int, profile: dict, context_msg: types.Message
         await increment_match_count(user_id)
         await increment_match_count(matched_partner_id)
 
-        await bot.send_message(
-            user_id,
-            f"🔗 Matched!\nSay hi!\nType /stop to disconnect."
-        )
-        await bot.send_message(
-            matched_partner_id,
-            f"🔗 Matched!\nSay hi!\nType /stop to disconnect."
-        )
+        await bot.send_message(user_id, "🔗 Matched!\nSay hi!\nType /stop to disconnect.")
+        await bot.send_message(matched_partner_id, "🔗 Matched!\nSay hi!\nType /stop to disconnect.")
     else:
+        # No match found yet, place or keep on waitlist
         waitlist[user_id] = profile
+        
+        # If this is their first time searching, start the 1-minute timer
+        if not is_retry:
+            asyncio.create_task(expand_search_later(user_id))
+
+async def expand_search_later(user_id: int):
+    """Waits 1 minute, then expands preferences to ANY if still waiting."""
+    await asyncio.sleep(60) 
+    
+    # Check if they are STILL in the waitlist after 60 seconds
+    if user_id in waitlist:
+        # Overwrite their preference to ANY
+        waitlist[user_id]["pref_gender"] = "ANY"
+        
+        try:
+            await bot.send_message(user_id, "⏳ Taking a bit long... expanding search to anyone!")
+        except Exception:
+            pass # Ignores errors if the user blocked the bot while waiting
+            
+        # Re-run the matchmaker for them with the updated ANY preference
+        await run_matchmaker(user_id, waitlist[user_id], is_retry=True)
 
 @dp.message(Command("stop"))
 @dp.message(F.text == "⛓️‍💥 Disconnect")
