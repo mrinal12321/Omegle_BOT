@@ -146,10 +146,10 @@ async def run_matchmaker(user_id: int, profile: dict, is_retry: bool = False):
             asyncio.create_task(expand_search_later(user_id))
 
 async def expand_search_later(user_id: int):
-    """Waits 1 minute, then expands preferences to ANY if still waiting."""
-    await asyncio.sleep(60) 
+ 
+    await asyncio.sleep(15)  # Wait for 15 seconds before expanding search
     
-    # Check if they are STILL in the waitlist after 60 seconds
+    # Check if they are STILL in the waitlist after 15 seconds
     if user_id in waitlist:
         # Overwrite their preference to ANY
         waitlist[user_id]["pref_gender"] = "ANY"
